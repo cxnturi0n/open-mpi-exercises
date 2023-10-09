@@ -7,12 +7,16 @@
 #PBS -e Hello.err
 
 NCPU=$(wc -l < $PBS_NODEFILE)
+
 echo -----------------------
+
 echo This job is allocated on $NCPU cpus
 echo Job is running on nodes:
 cat $PBS_NODEFILE
 PBS_O_WORKDIR=$PBS_O_HOME/projects/demo
+
 echo ---------------------
+
 echo PBS: qsub is running on $PBS_O_HOST
 echo PBS: originating queue is $PBS_O_QUEUE
 echo PBS: executing queue is $PBS_QUEUE
@@ -23,7 +27,9 @@ echo PBS: job name is $PBS_JOBNAME
 echo PBS: node file is $PBS_NODEFILE
 echo PBS: current home directory is $PBS_O_HOME
 echo PBS: PATH = $PBS_O_PATH
+
 echo -----------------------------------
+
 echo "Compiling.. /usr/lib64/openmpi/1.4-gcc/bin/mpicc -o $PBS_O_WORKDIR/Hello $PBS_O_WORKDIR/Hello.c"
 /usr/lib64/openmpi/1.4-gcc/bin/mpicc -o $PBS_O_WORKDIR/Hello $PBS_O_WORKDIR/Hello.c
 
