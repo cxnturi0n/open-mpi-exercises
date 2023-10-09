@@ -1,0 +1,33 @@
+-----------------------
+This job is allocated on 8 cpus
+Job is running on nodes:
+wn280.scope.unina.it
+wn280.scope.unina.it
+wn280.scope.unina.it
+wn280.scope.unina.it
+wn280.scope.unina.it
+wn280.scope.unina.it
+wn280.scope.unina.it
+wn280.scope.unina.it
+---------------------
+PBS: qsub is running on ui-studenti.scope.unina.it
+PBS: originating queue is studenti
+PBS: executing queue is studenti
+PBS: working directory is /homes/DMA/PDC/2024/CNCFBA98U/projects/demo
+PBS: execution mode is PBS_BATCH
+PBS: job identifier is 4008027.torque02.scope.unina.it
+PBS: job name is Hello
+PBS: node file is /var/spool/pbs/aux//4008027.torque02.scope.unina.it
+PBS: current home directory is /homes/DMA/PDC/2024/CNCFBA98U
+PBS: PATH = /usr/lib64/openmpi/1.2.7-gcc/bin:/usr/kerberos/bin:/opt/exp_soft/unina.it/intel/composer_xe_2013_sp1.3.174/bin/intel64:/opt/exp_soft/unina.it/intel/composer_xe_2013_sp1.3.174/mpirt/bin/intel64:/opt/exp_soft/unina.it/intel/composer_xe_2013_sp1.3.174/bin/intel64:/opt/exp_soft/unina.it/intel/composer_xe_2013_sp1.3.174/bin/intel64_mic:/opt/exp_soft/unina.it/intel/composer_xe_2013_sp1.3.174/debugger/gui/intel64:/opt/d-cache/srm/bin:/opt/d-cache/dcap/bin:/opt/edg/bin:/opt/glite/bin:/opt/globus/bin:/opt/lcg/bin:/usr/local/bin:/bin:/usr/bin:/opt/exp_soft/HADOOP/hadoop-1.0.3/bin:/opt/exp_soft/unina.it/intel/composerxe/bin/intel64/:/opt/exp_soft/unina.it/MPJExpress/mpj-v0_38/bin:/homes/DMA/PDC/2024/CNCFBA98U/bin
+-----------------------------------
+Compiling.. /usr/lib64/openmpi/1.4-gcc/bin/mpicc -o /homes/DMA/PDC/2024/CNCFBA98U/projects/demo/Hello /homes/DMA/PDC/2024/CNCFBA98U/projects/demo/Hello.c
+Executing.. /usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile /var/spool/pbs/aux//4008027.torque02.scope.unina.it -np 8 /homes/DMA/PDC/2024/CNCFBA98U/projects/demo/Hello
+I am 0 of 8
+I am 7 of 8
+I am 2 of 8
+I am 6 of 8
+I am 3 of 8
+I am 4 of 8
+I am 5 of 8
+I am 1 of 8
