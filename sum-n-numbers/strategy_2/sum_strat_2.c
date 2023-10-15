@@ -63,7 +63,10 @@ int main(int argc, char *argv[]) {
     double *data = (double *)malloc(data_size * sizeof(double));
     // the expected sum is `data_size`
     for (i = 0; i < data_size; i++) {
-      data[i] = 1; // in real case scenario substitute with rand() / RAND_MAX;
+      // data[i] = 1; // in real case scenario substitute with rand() /
+      // RAND_MAX;
+      /* data[i] = rand() % 100; */
+      data[i] = (double)rand() / RAND_MAX;
     }
 
     // save data for process 0
