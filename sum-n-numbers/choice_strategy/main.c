@@ -130,11 +130,16 @@ int main(int argc, char *argv[])
   time_end = MPI_Wtime();
 
   free(local_data);
-  if (rank == 0)
-  {
-    printf("Total sum: %lf\t expected: %lf\n", sum, expected_sum);
-    time = time_end - time_start;
-    printf("%lf elapsed\n", time);
+  
+  time = time_end - time_start;
+
+  USE_MERGE_STRATEGY[selected_strategy](nprocs, rank, &time);
+  if (rank == 0) {
+    // only process 0 does the report for statistics
+    time /= nprocs; // compute the average
+    // nprocs, input, strategy, expected, result, average_time
+    printf("%d, %d, %s, %lf, %lf, %lf\n", nprocs, size,
+           strategy_to_str(selected_strategy), expected_sum, sum, time);
   }
 
   MPI_Finalize();
