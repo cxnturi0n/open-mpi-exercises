@@ -129,9 +129,9 @@ int main(int argc, char *argv[])
 
   time_end = MPI_Wtime();
 
-  free(local_data);
-  
   time = time_end - time_start;
+	
+  free(local_data);
 
   USE_MERGE_STRATEGY[selected_strategy](nprocs, rank, &time);
   if (rank == 0) {
