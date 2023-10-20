@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
     // only process 0 does the report for statistics
     time /= nprocs; // compute the average
     // nprocs, input, strategy, expected, result, average_time
-    printf("%d, %d, %s, %lf, %lf, %lf\n", nprocs, size,
+    printf("%d,%d,%s,%lf,%lf,%lf", nprocs, size,
            strategy_to_str(selected_strategy), expected_sum, sum, time);
   }
 
