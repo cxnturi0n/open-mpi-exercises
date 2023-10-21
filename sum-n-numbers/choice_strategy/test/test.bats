@@ -56,8 +56,6 @@ teardown(){
   done
 
   # Check that program redirects to strategy 1
-  strategy="$(tail -n 1 prova | cut -d , -f 3)"
+  strategy="$(tail -n 1 $WORKDIR/Sum.out | cut -d , -f 3)"
   [ "$strategy" == "Strategy 1" ]
 }
-
-
