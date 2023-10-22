@@ -18,16 +18,16 @@ In this case *mpi* run with the following configuration:
 # Local testing
 
 Build docker image:
-```
+```bash
 docker build . -t openmpi-batscore
 ```
 
 Launch and interact with container:
-```
+```bash
 docker run -it  openmpi-batscore
 ```
 
 Change directory to test and execute tests:
-```
+```bash
 cd test && ./test.bats
 ```
