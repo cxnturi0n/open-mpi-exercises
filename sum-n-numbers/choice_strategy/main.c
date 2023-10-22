@@ -40,12 +40,6 @@ int main(int argc, char *argv[]) {
   }
 
   int size = atoi(argv[1]);
-  if (size < 0) {
-    if (rank == 0) {
-      fprintf(stderr, INVALID_INPUT_NUMBER);
-    }
-    exit(EXIT_FAILURE);
-  }
 
   strategy_t selected_strategy = parse_strategy(argv[2]);
   if (selected_strategy == STRATEGY_WRONG) {
