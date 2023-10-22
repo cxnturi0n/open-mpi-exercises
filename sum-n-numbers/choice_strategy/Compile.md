@@ -14,3 +14,20 @@ In this case *mpi* run with the following configuration:
 - `sum_n_numbers` runs with:
   - `1000000` as input number
   - Use strategy `3`
+
+# Local testing
+
+Build docker image:
+```
+docker build . -t openmpi-batscore
+```
+
+Launch and interact with container:
+```
+docker run -it  openmpi-batscore
+```
+
+Change directory to test and execute tests:
+```
+cd test && ./test.bats
+```

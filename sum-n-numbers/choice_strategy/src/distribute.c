@@ -1,5 +1,5 @@
-#include "distribute.h"
-#include "constants.h"
+#include "../include/distribute.h"
+#include "../include/constants.h"
 #include <stdio.h>
 
 void distribute_data(int nprocs, int extra_numbers, double *data,

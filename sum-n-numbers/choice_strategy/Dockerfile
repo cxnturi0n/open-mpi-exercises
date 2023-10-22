@@ -2,7 +2,7 @@ FROM alpine:3.16.0
 
 RUN apk update \
       && apk upgrade \
-      && apk add --no-cache build-base libatomic gfortran git valgrind perl linux-headers openssh bash
+      && apk add --no-cache ncurses build-base libatomic gfortran git valgrind perl linux-headers openssh bash 
 
 #### INSTALL OPENMPI ####
 # Source is available at https://www.open-mpi.org/software/ompi/
@@ -39,10 +39,20 @@ RUN chown -R ${USER}:${USER} ${USER_HOME}
 #### CREATE WORKING DIRECTORY FOR USER ####
 ARG WORKDIR=/project
 ENV WORKDIR ${WORKDIR}
+ENV ENV=${WORKDIR}/.rc
 RUN mkdir ${WORKDIR}
-RUN chown -R ${USER}:${USER} ${WORKDIR}
-RUN mkdir ${WORKDIR}/test
-RUN git clone https://github.com/bats-core/bats-core.git ${WORKDIR}/test
 
 WORKDIR ${WORKDIR}
+
+ADD src src
+ADD include include
+ADD test test
+
+RUN git clone https://github.com/bats-core/bats-core.git 
+
+RUN chown -R ${USER}:${USER} ${WORKDIR}
+
+RUN echo 'export PS1="\[$(tput bold)\]\[\033[38;5;196m\]\u\[$(tput sgr0)\]\[\033[38;5;20m\]@\[$(tput sgr0)\]\[\033[38;5;27m\]\h\[$(tput sgr0)\]\[\033[38;5;33m\][\[$(tput sgr0)\]\[\033[38;5;45m\]\w\[$(tput sgr0)\]\[\033[38;5;33m\]]\[$(tput sgr0)\]\[$(tput bold)\]\[\033[38;5;46m\]>"' >> ${WORKDIR}/.rc
+
 USER ${USER}
+

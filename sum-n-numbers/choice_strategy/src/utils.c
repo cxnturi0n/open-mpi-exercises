@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "../include/utils.h"
 
 int is_number(char *input) {
   int i = 0;

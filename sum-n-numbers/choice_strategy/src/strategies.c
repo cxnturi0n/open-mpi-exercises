@@ -1,5 +1,5 @@
-#include "strategies.h"
-#include "bitwise_algo.h"
+#include "../include/strategies.h"
+#include "../include/bitwise_algo.h"
 
 void merge_strategy_1(int nprocs, int rank, double *sum) {
   if (rank == 0) {

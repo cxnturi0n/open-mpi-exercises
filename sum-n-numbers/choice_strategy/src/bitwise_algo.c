@@ -1,4 +1,4 @@
-#include "bitwise_algo.h"
+#include "../include/bitwise_algo.h"
 
 int is_power_of_2(int n) { return n && !(n & (n - 1)); }
 

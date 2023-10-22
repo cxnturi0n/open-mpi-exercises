@@ -1,14 +1,14 @@
-#include "constants.h"
+#include "../include/constants.h"
 #include "mpi.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "bitwise_algo.h"
-#include "distribute.h"
-#include "strategies.h"
-#include "utils.h"
+#include "../include/bitwise_algo.h"
+#include "../include/distribute.h"
+#include "../include/strategies.h"
+#include "../include/utils.h"
 
 void (*USE_MERGE_STRATEGY[])(int nprocs, int rank, double *data) = {
     [STRATEGY_1] = merge_strategy_1,

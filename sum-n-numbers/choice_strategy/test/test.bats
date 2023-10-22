@@ -1,14 +1,14 @@
-#!/usr/bin/env /project/test/bats-core/bin/bats
+#!/usr/bin/env /project/bats-core/bin/bats
 
-WORKDIR="$(pwd)/.."
-
-hostname > $WORKDIR/hostfile
-mpicc $WORKDIR/main.c $WORKDIR/strategies.c $WORKDIR/distribute.c $WORKDIR/utils.c $WORKDIR/bitwise_algo.c -o $WORKDIR/sum_n_nums
-
-touch $WORKDIR/Sum.out
->$WORKDIR/Sum.out
-touch $WORKDIR/Sum.err
->$WORKDIR/Sum.err 
+setup(){
+  WORKDIR="$(pwd)/.."
+  hostname > $WORKDIR/hostfile
+  mpicc $WORKDIR/src/main.c $WORKDIR/src/strategies.c $WORKDIR/src/distribute.c $WORKDIR/src/utils.c $WORKDIR/src/bitwise_algo.c -o $WORKDIR/sum_n_nums
+  touch $WORKDIR/Sum.out
+  >$WORKDIR/Sum.out
+  touch $WORKDIR/Sum.err
+  >$WORKDIR/Sum.err 
+}
 
 teardown(){
   >$WORKDIR/Sum.out
