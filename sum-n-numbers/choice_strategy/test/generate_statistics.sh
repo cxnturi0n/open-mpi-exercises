@@ -34,7 +34,7 @@ for SIZE in "${SIZES[@]}"; do
 
 
       # Call qsub with the specified values for SIZE, STRATEGY, nodes, and ppn
-      # qsub -l nodes="$nodes":ppn="$ppn" -v SIZE="$SIZE",STRATEGY="$STRATEGY" -V "$WORKDIR/Sum.pbs"
+      # qsub -o run_$STRATEGY_$SIZE.out -l nodes="$nodes":ppn="$ppn" -v SIZE="$SIZE",STRATEGY="$STRATEGY" -V "$WORKDIR/Sum.pbs"
       # Decomment to print qsub commands generated:
       echo qsub -o run_$STRATEGY_$SIZE.out -l nodes="$nodes":ppn="$ppn" -v SIZE="$SIZE",STRATEGY="$STRATEGY" -V "$WORKDIR/Sum.pbs"
     done

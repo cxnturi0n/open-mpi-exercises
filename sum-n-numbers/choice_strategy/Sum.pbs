@@ -5,8 +5,6 @@
 #PBS -q studenti
 #PBS -l nodes=8:ppn=8
 #PBS -N Sum
-#PBS -o Sum.out
-#PBS -e Sum.err
 
 sort -u $PBS_NODEFILE > hostlist
 
