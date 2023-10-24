@@ -1,4 +1,4 @@
-nprocs, input, strategy, result, average_time, max_time,speed_up,efficiency,total_overhead
+nprocs, input, strategy, result, average_time, max_time, speed_up, efficiency, total_overhead
 1,10000,Strategy 1,10000.000000,0.000048,0.000048,1.0,1.0,0.0
 2,10000,Strategy 1,10000.000000,0.000036,0.000038,1.263157894736842,0.631578947368421,2.8000000000000003e-05
 4,10000,Strategy 1,10000.000000,0.000710,0.002767,0.01734730755330683,0.0043368268883267076,0.01102

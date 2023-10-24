@@ -1,4 +1,4 @@
-nprocs, input, strategy, result, average_time, max_time, speed_up, efficiency
+nprocs, input, strategy, result, average_time, max_time
 1,1000000,Strategy 1,1000000.000000,0.004896,0.004896
 2,1000000,Strategy 1,1000000.000000,0.002152,0.002153
 4,1000000,Strategy 1,1000000.000000,0.001693,0.003525

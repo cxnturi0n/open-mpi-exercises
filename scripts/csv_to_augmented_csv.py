@@ -17,7 +17,7 @@ with open(input_csv, 'r') as csvfile, open(output_csv, 'w', newline='') as outpu
     
     # Read the header row and add the new column names
     header = next(reader)
-    header += ['speed_up', 'efficiency', 'total_overhead']
+    header += [' speed_up', ' efficiency', ' total_overhead']
     writer.writerow(header)
 
     # Read the rows and calculate and add the values for "speed_up," "efficiency," and "total_overhead"
