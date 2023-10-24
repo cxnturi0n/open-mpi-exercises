@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
+
 import matplotlib.pyplot as plt
 import csv
 import sys
 
 if len(sys.argv) < 4:
-    print("Usage: python script.py <input_path> <y_label_name> <output_path> <plot_name>")
+    print("Usage: ./gen_plot.py <input_path> <y_label_name> <output_path> <plot_name>")
     sys.exit(1)
 
 input_path = sys.argv[1]

@@ -44,11 +44,11 @@ echo ""
 echo nprocs, input, strategy, result, average_time, max_time
 for i in 1 2 3
 do
-  for j in {1..$REPEAT_TIMES}
-  do
     for n in 1 2 4 8
     do
-      /usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist -np $n $PBS_O_WORKDIR/sum 100000000 $i
-    done
+        for j in $(seq $REPEAT_TIMES)
+        do
+          /usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist -np $n $PBS_O_WORKDIR/sum 100000000 $i
+        done
   done
-done
+done 
