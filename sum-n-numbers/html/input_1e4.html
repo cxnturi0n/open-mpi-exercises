@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  /* Style for the panel */
+  .panel.panel-success {
+    border: 1px solid #white;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: white; /* Example background color */
+  }
+
+  /* Style for the table */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .table th, .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .table th {
+    background-color: blue; /* Header background color */
+    color: white;
+  }
+
+  .table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Even row background color */
+  }
+
+  .table tr:hover {
+    background-color: #ddd; /* Hover row background color */
+  }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+      </div>
+      <table border="1" class="table table-striped table-bordered table-hover table-condensed">
+        <thead>
+          <tr>
+            <th title="Field #1">nprocs</th>
+            <th title="Field #2">input</th>
+            <th title="Field #3">strategy</th>
+            <th title="Field #5">average_time</th>
+            <th title="Field #6">max_time</th>
+            <th title="Field #7">speed_up</th>
+            <th title="Field #8">efficiency</th>
+            <th title="Field #9">total_overhead</th>
+</tr></thead>
+<tbody><tr><td align="right">1</td>
+<td align="right">10000</td>
+<td>Strategy 1</td>
+<td align="right">0.000048</td>
+<td align="right">0.000048</td>
+<td align="right">1.000000000000000000</td>
+<td align="right">1.0000000000000000000</td>
+<td align="right">0.00000000000000000000</td>
+</tr>
+<tr><td align="right">2</td>
+<td align="right">10000</td>
+<td>Strategy 1</td>
+<td align="right">0.000036</td>
+<td align="right">0.000038</td>
+<td align="right">1.263157894736842035</td>
+<td align="right">0.6315789473684210176</td>
+<td align="right">0.00002800000000000000</td>
+</tr>
+<tr><td align="right">4</td>
+<td align="right">10000</td>
+<td>Strategy 1</td>
+<td align="right">0.000710</td>
+<td align="right">0.002767</td>
+<td align="right">0.017347307553306830</td>
+<td align="right">0.0043368268883267076</td>
+<td align="right">0.01102000000000000028</td>
+</tr>
+<tr><td align="right">8</td>
+<td align="right">10000</td>
+<td>Strategy 1</td>
+<td align="right">0.000271</td>
+<td align="right">0.002027</td>
+<td align="right">0.023680315737543166</td>
+<td align="right">0.0029600394671928957</td>
+<td align="right">0.01616800000000000181</td>
+</tr>
+<tr><td align="right">1</td>
+<td align="right">10000</td>
+<td>Strategy 2</td>
+<td align="right">0.000048</td>
+<td align="right">0.000048</td>
+<td align="right">1.000000000000000000</td>
+<td align="right">1.0000000000000000000</td>
+<td align="right">0.00000000000000000000</td>
+</tr>
+<tr><td align="right">2</td>
+<td align="right">10000</td>
+<td>Strategy 2</td>
+<td align="right">0.000039</td>
+<td align="right">0.000042</td>
+<td align="right">1.142857142857143016</td>
+<td align="right">0.5714285714285715079</td>
+<td align="right">0.00003599999999999999</td>
+</tr>
+<tr><td align="right">4</td>
+<td align="right">10000</td>
+<td>Strategy 2</td>
+<td align="right">0.001373</td>
+<td align="right">0.002725</td>
+<td align="right">0.017614678899082570</td>
+<td align="right">0.0044036697247706426</td>
+<td align="right">0.01085200000000000053</td>
+</tr>
+<tr><td align="right">8</td>
+<td align="right">10000</td>
+<td>Strategy 2</td>
+<td align="right">0.000520</td>
+<td align="right">0.002021</td>
+<td align="right">0.023750618505690255</td>
+<td align="right">0.0029688273132112818</td>
+<td align="right">0.01611999999999999891</td>
+</tr>
+<tr><td align="right">1</td>
+<td align="right">10000</td>
+<td>Strategy 3</td>
+<td align="right">0.000048</td>
+<td align="right">0.000048</td>
+<td align="right">1.000000000000000000</td>
+<td align="right">1.0000000000000000000</td>
+<td align="right">0.00000000000000000000</td>
+</tr>
+<tr><td align="right">2</td>
+<td align="right">10000</td>
+<td>Strategy 3</td>
+<td align="right">0.000041</td>
+<td align="right">0.000043</td>
+<td align="right">1.116279069767441845</td>
+<td align="right">0.5581395348837209225</td>
+<td align="right">0.00003800000000000000</td>
+</tr>
+<tr><td align="right">4</td>
+<td align="right">10000</td>
+<td>Strategy 3</td>
+<td align="right">0.001399</td>
+<td align="right">0.002753</td>
+<td align="right">0.017435524881946968</td>
+<td align="right">0.0043588812204867419</td>
+<td align="right">0.01096399999999999979</td>
+</tr>
+<tr><td align="right">8</td>
+<td align="right">10000</td>
+<td>Strategy 3</td>
+<td align="right">0.001348</td>
+<td align="right">0.002044</td>
+<td align="right">0.023483365949119376</td>
+<td align="right">0.0029354207436399220</td>
+<td align="right">0.01630399999999999905</td>
+</tr>        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
