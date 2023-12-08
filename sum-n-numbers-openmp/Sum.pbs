@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#Default PBS directives. Can be overridden by qsub: launching qsub -l nodes=4:ppn=4 will override the directive specified in this PBS.
+
+#PBS -o Sum.out
+#PBS -e Sum.err
+#PBS -q studenti
+#PBS -l nodes=1:ppn=8
+#PBS -N Sum
+
+sort -u $PBS_NODEFILE > hostlist
+
+PBS_O_WORKDIR=$PBS_O_HOME/sum
+NCPU=$(wc -l < hostlist)
+
+echo -----------------------
+
+echo This job is allocated on $NCPU cpus on hosts:
+cat hostlist
+
+echo ---------------------
+
+echo PBS: qsub is running on $PBS_O_HOST
+echo PBS: originating queue is $PBS_O_QUEUE
+echo PBS: executing queue is $PBS_QUEUE
+echo PBS: working directory is $PBS_O_WORKDIR
+echo PBS: execution mode is $PBS_ENVIRONMENT
+echo PBS: job identifier is $PBS_JOBID
+echo PBS: job name is $PBS_JOBNAME
+echo PBS: node file is $PBS_NODEFILE
+echo PBS: current home directory is $PBS_O_HOME
+echo PBS: PATH = $PBS_O_PATH
+
+echo -----------------------------------
+
+echo exec, input, expected, result, time,
+gcc -o $PBS_WORKDIR/sum $PBS_WORKDIR/main.c -lgomp -fopenmp
+gcc -o $PBS_WORKDIR/sum_o1 $PBS_WORKDIR/main.c -lgomp -fopenmp -O1
+gcc -o $PBS_WORKDIR/sum_o2 $PBS_WORKDIR/main.c -lgomp -fopenmp -O2
+gcc -o $PBS_WORKDIR/sum_o3 $PBS_WORKDIR/main.c -lgomp -fopenmp -O3
+
+for i in 10000 100000 1000000 10000000;
+do
+  $PBS_WORKDIR/sum $i
+  $PBS_WORKDIR/sum_o1 $i
+  $PBS_WORKDIR/sum_o2 $i
+  $PBS_WORKDIR/sum_o3 $i
+done
