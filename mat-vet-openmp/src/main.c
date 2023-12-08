@@ -153,7 +153,7 @@ double *matxvet_strat(int row_size, int col_size, double *vector,
   }
 
 #pragma omp parallel for default(none)                                         \
-    shared(n, m, matrix, vector, y) private(i, j)
+    shared(row_size, col_size, matrix, vector, y) private(i, j)
   for (i = 0; i < row_size; i++) {
     for (j = 0; j < col_size; j++) {
       result[i] += matrix[i][j] * vector[j];
