@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #PBS -q studenti
-#PBS -l nodes=1 :ppn=8
+#PBS -l nodes=1:ppn=8
 #PBS -N Product
-#PBS -o Product.out
-#PBS -e Product.err
+#PBS -o Product_32_threads.out
+#PBS -e Product_32_threads.err
 
 echo Job is running on nodes:
 cat $PBS_NODEFILE
@@ -34,8 +34,8 @@ gcc -fopenmp -lgomp -std=c99 -o $PBS_O_WORKDIR/mat-vet $PBS_O_WORKDIR/src/mat-ve
 
 echo Executing..
 
-for ((i=1; i<=100; i = i*10))
+for ((i=50; i<=100; i = i+25))
 do
-    size=$((200 * i))
+    size=$((256 * i))
     $PBS_O_WORKDIR/mat-vet $size $size 32
 done
