@@ -32,10 +32,8 @@ echo Compiling..
 
 gcc -fopenmp -lgomp -std=c99 -o $PBS_O_WORKDIR/mat-vet $PBS_O_WORKDIR/src/mat-vet.c
 
-echo Executing..
+$PBS_O_WORKDIR/mat-vet 320 320 4
+$PBS_O_WORKDIR/mat-vet 3200 3200 4
+$PBS_O_WORKDIR/mat-vet 32000 32000 4
 
-for ((i=50; i<=100; i = i+25))
-do
-    size=$((32 * i))
-    $PBS_O_WORKDIR/mat-vet $size $size 4
-done
+

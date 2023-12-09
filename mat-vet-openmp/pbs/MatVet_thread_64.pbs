@@ -34,9 +34,9 @@ gcc -fopenmp -lgomp -std=c99 -o $PBS_O_WORKDIR/mat-vet $PBS_O_WORKDIR/src/mat-ve
 
 echo Executing..
 
-$PBS_O_WORKDIR/mat-vet 25600 25600 64
+$PBS_O_WORKDIR/mat-vet 320 320 64
+$PBS_O_WORKDIR/mat-vet 3200 3200 64
+$PBS_O_WORKDIR/mat-vet 32000 32000 64
 
-$PBS_O_WORKDIR/mat-vet 29050 29050 64
 
-$PBS_O_WORKDIR/mat-vet 32500 32500 64
 
