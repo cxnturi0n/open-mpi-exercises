@@ -17,20 +17,21 @@ nthreads = [1, 2, 4, 8, 16, 32, 64]
 speed_up = []
 efficiency = []
 overhead = []
+asintoto = nthreads
 
 with open(input_path, 'r') as csvfile:
     lines = csv.reader(csvfile, delimiter=',')
     for row in lines:
-            speed_up.append(float(row[1])) # speed up
-            efficiency.append(float(row[2])) # efficiency
-            overhead.append(float(row[3])) # overhead
+            speed_up.append(float(row[2])) # speed up
+            efficiency.append(float(row[3])) # efficiency
+            overhead.append(float(row[4])) # overhead
                    
 
 plt.plot(nthreads, speed_up, color='g', linestyle='dashed', marker='o', label="speed up")
 plt.plot(nthreads, efficiency, color='r', linestyle='dashed', marker='o', label="efficiency")
 plt.plot(nthreads, overhead, color='b', linestyle='dashed', marker='o', label="overhead")
+plt.plot(nthreads, asintoto, color='y', linestyle='dashed', marker='o', label="ideal speedup")
 plt.xlabel('nthreads')
-plt.ylabel('time')
 plt.title(plot_name, fontsize=20)
 
 plt.grid()
