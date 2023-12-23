@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 void distribute_data(int nprocs, int extra_numbers, double *data,
-                     int send_size) {
+                     int send_size, ) {
   int process;
   int offset = 0;
   for (process = 1; process < nprocs; process++) {

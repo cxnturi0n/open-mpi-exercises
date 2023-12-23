@@ -1,0 +1,90 @@
+#include "../include/communicator.h"
+#include "../include/messages.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+void build_2D_torus(MPI_Comm *torus_comm, MPI_Comm *rows_comm,
+                    MPI_Comm *cols_comm, int num_procs_rows,
+                    int num_procs_cols) {
+  // don't reorder processors
+  int reorder = 0;
+
+  // TODO: free them
+  int *dimensions = (int *)malloc(2 * sizeof(int));
+  int *periods = (int *)malloc(2 * sizeof(int));
+
+  // TODO: error message malloc failed
+  if (!dimensions || !periods) {
+    fprintf(stderr, MALLOC_FAILURE);
+    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+  }
+
+  dimensions[0] = num_procs_rows;
+  dimensions[1] = num_procs_cols;
+
+  periods[0] = periods[1] = 1;
+
+  // create the torus
+  MPI_Cart_create(MPI_COMM_WORLD, 2, dimensions, periods, reorder, torus_comm);
+
+  int projections[2];
+  // rows
+  projections[0] = 0, projections[1] = 1;
+  MPI_Cart_sub(*torus_comm, projections, rows_comm);
+
+  // rows
+  projections[1] = 0, projections[0] = 1;
+  MPI_Cart_sub(*torus_comm, projections, cols_comm);
+
+  return;
+}
+
+void distribute(int nprocs, int rank, double **matrix_1, double **matrix_2,
+                double *local_matrix_1, double *local_matrix_2, int size,
+                int sub_size) {
+  if (rank == 0) {
+    int total_size = sub_size * sub_size;
+
+    double *sub_matrix_1 = (double *)malloc(total_size * sizeof(double));
+    double *sub_matrix_2 = (double *)malloc(total_size * sizeof(double));
+
+    if (!sub_matrix_1 || !sub_matrix_2) {
+      fprintf(stderr, MALLOC_FAILURE);
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+    }
+
+    int row_offset = 0;
+    int col_offset = 0;
+    for (int i = 0; i < nprocs; i++) {
+      int index = 0;
+      for (int j = 0; j < sub_size; j++) {
+        for (int k = 0; k < sub_size; k++) {
+          sub_matrix_1[index] = matrix_1[row_offset + j][col_offset + k];
+          sub_matrix_2[index] = matrix_2[row_offset + j][col_offset + k];
+          index++;
+        }
+      }
+      col_offset = (col_offset + sub_size) % size;
+      if (i % 3 == 0) {
+        row_offset += sub_size;
+      }
+      // if non root, send data
+      if (i > 0) {
+        MPI_Send(sub_matrix_1, sub_size, MPI_DOUBLE, i, TAG_DISTRIBUTE_SEND + 1,
+                 MPI_COMM_WORLD);
+        MPI_Send(sub_matrix_2, sub_size, MPI_DOUBLE, i, TAG_DISTRIBUTE_SEND + 2,
+                 MPI_COMM_WORLD);
+      }
+    }
+
+    free(sub_matrix_1);
+    free(sub_matrix_2);
+
+  } else {
+    MPI_Recv(local_matrix_1, sub_size, MPI_DOUBLE, 0, TAG_DISTRIBUTE_RECV + 1,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(local_matrix_2, sub_size, MPI_DOUBLE, 0, TAG_DISTRIBUTE_RECV + 2,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  }
+  return;
+}
