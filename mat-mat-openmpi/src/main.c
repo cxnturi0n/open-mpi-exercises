@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm torus, rows, cols;
   int number_row_procs = (int)sqrt(nprocs);
   int number_col_procs = nprocs / number_row_procs;
-  int *coordinates = (int *)malloc(2 * sizeof(int));
+  int coordinates[] = {0, 0};
 
   if (nprocs % number_row_procs != 0) {
     if (rank == 0) {
@@ -43,12 +43,6 @@ int main(int argc, char *argv[]) {
   // build communication torus
   build_2D_torus(&torus, &rows, &cols, number_row_procs, number_col_procs);
   MPI_Barrier(MPI_COMM_WORLD);
-
-  // everybody get their coord from the torus
-  MPI_Cart_coords(torus, rank, 2, coordinates);
-
-  // get square matrix size from input
-  // TODO: check that it is a real number
 
   if (!is_number(argv[1])) {
     if (rank == 0) {
@@ -129,7 +123,10 @@ int main(int argc, char *argv[]) {
   MPI_Barrier();
   double start = MPI_Wtime();
 
-  // TODO: BMR algo here
+  for (int i = 0; i < size; i++) {
+    broadcast_rolling_multiply(local_matrix_1, local_matrix_2, local_result,
+                               &torus, &rows, &cols, sub_size, size, i);
+  }
 
   double end = MPI_Wtime();
 
@@ -143,9 +140,15 @@ int main(int argc, char *argv[]) {
     printf("%d, %d, %lf\n", nprocs, size, max_time);
   }
 
+  double **result =
+      recompose_result(local_result, sub_size, size, rank, nprocs);
+
+  // TODO: add control to see if the algorithm works
+
   free(local_matrix_1);
   free(local_matrix_2);
   free(local_result);
+  free(result);
 
   MPI_Finalize();
   return 0;

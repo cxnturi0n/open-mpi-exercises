@@ -3,8 +3,8 @@
 
 double random_number();
 
-void local_matrix_product(double *matrix_1, double *matrix_2, double *result,
-                          int size);
+void matrix_product(double *matrix_1, double *matrix_2, double *result,
+                    int size);
 
 int is_number(char *s);
 

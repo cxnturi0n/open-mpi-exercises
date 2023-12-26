@@ -9,8 +9,8 @@ double random_number() {
 // work on square matrix
 // MPI require contiguos memory, hence the matrix must be treated as a vector
 // instead of a vector of vectors
-void local_matrix_product(double *matrix_1, double *matrix_2, double *result,
-                          int size) {
+void matrix_product(double *matrix_1, double *matrix_2, double *result,
+                    int size) {
   for (int i = 0; i < size; i++) {
     for (int j = 0; j < size; j++) {
       for (int k = 0; k < size; k++) {
