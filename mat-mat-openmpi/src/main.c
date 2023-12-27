@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  int sub_size = (size / number_row_procs) / number_col_procs;
+  int sub_size = size / number_row_procs;
 
   local_result = (double *)calloc(sub_size * sub_size, sizeof(double));
   if (!local_result) {
@@ -122,46 +122,48 @@ int main(int argc, char *argv[]) {
   /*   } */
   /* } */
 
-  /*
-    if (rank == 0) {
-      free(matrix_1);
-      free(matrix_2);
-    }
+  if (rank == 0) {
+    free(matrix_1);
+    free(matrix_2);
+  }
 
-    // get coordinate of communicationc couples
-    // sender & receiver
+  // get coordinate of communicationc couples
+  // sender & receiver
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    double start = MPI_Wtime();
+  MPI_Barrier(MPI_COMM_WORLD);
 
-    for (int i = 0; i < size; i++) {
-      broadcast_rolling_multiply(local_matrix_1, local_matrix_2, local_result,
-                                 &torus, &rows, &cols, sub_size, size, i);
-    }
+  double start = MPI_Wtime();
 
-    double end = MPI_Wtime();
+  for (int i = 0; i < number_row_procs; i++) {
+    broadcast_rolling_multiply(local_matrix_1, local_matrix_2, local_result,
+                               &torus, &rows, &cols, sub_size, number_row_procs,
+                               i);
+    printf("step %d\n", i);
+  }
 
-    double delta_time = end - start;
+  double end = MPI_Wtime();
 
-    double max_time;
-    MPI_Reduce(&max_time, &delta_time, 1, MPI_DOUBLE, MPI_MAX, 0,
-    MPI_COMM_WORLD);
+  printf("\nBMR DONE\n\n");
 
-    if (rank == 0) {
-      // number of procs, matrix size, time elapsed
-      printf("%d, %d, %lf\n", nprocs, size, max_time);
-    }
+  double delta_time = end - start;
 
-    double **result =
-        recompose_result(local_result, sub_size, size, rank, nprocs);
+  double max_time;
+  MPI_Reduce(&max_time, &delta_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-    // TODO: add control to see if the algorithm works
+  if (rank == 0) {
+    // number of procs, matrix size, time elapsed
+    printf("%d, %d, %lf\n", nprocs, size, max_time);
+  }
 
-    free(local_matrix_1);
-    free(local_matrix_2);
-    free(local_result);
-    free(result);
-  */
+  double **result =
+      recompose_result(local_result, sub_size, size, rank, nprocs);
+
+  // TODO: add control to see if the algorithm works
+
+  free(local_matrix_1);
+  free(local_matrix_2);
+  free(local_result);
+  free(result);
   MPI_Finalize();
   return 0;
 }

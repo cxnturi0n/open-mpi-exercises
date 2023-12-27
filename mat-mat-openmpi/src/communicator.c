@@ -9,13 +9,11 @@ void build_2D_torus(MPI_Comm *torus_comm, MPI_Comm *rows_comm,
                     MPI_Comm *cols_comm, int num_procs_rows,
                     int num_procs_cols) {
   // don't reorder processors
-  int reorder = 0;
+  int reorder = 1;
 
-  // TODO: free them
   int *dimensions = (int *)malloc(2 * sizeof(int));
   int *periods = (int *)malloc(2 * sizeof(int));
 
-  // TODO: error message malloc failed
   if (!dimensions || !periods) {
     fprintf(stderr, MALLOC_FAILURE);
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
@@ -40,6 +38,9 @@ void build_2D_torus(MPI_Comm *torus_comm, MPI_Comm *rows_comm,
   projections[0] = 1;
   projections[1] = 0;
   MPI_Cart_sub(*torus_comm, projections, cols_comm);
+
+  free(dimensions);
+  free(periods);
 
   return;
 }
@@ -67,33 +68,28 @@ void distribute(int nprocs, int rank, double **matrix_1, double **matrix_2,
 
     int row_offset = 0;
     int col_offset = 0;
-    for (int i = 0; i < nprocs; i++) {
-      int index = 0;
-      for (int j = 0; j < sub_size; j++) {
-        printf("id := %d receive:\n", i);
-        for (int k = 0; k < sub_size; k++) {
-          printf("m1[%d, %d] := %lf \t m2[%d, %d] := %lf\n", row_offset + j,
-                 col_offset + k, matrix_1[row_offset + j][col_offset + k],
-                 row_offset + j, col_offset + k,
-                 matrix_2[row_offset + j][col_offset + k]);
 
-          sub_matrix_1[index] = matrix_1[row_offset + j][col_offset + k];
-          sub_matrix_2[index] = matrix_2[row_offset + j][col_offset + k];
+    for (int id_process = 0; id_process < nprocs; id_process++) {
+      int index = 0;
+      for (int i = 0; i < sub_size; i++) {
+        for (int j = 0; j < sub_size; j++) {
+          sub_matrix_1[index] = matrix_1[row_offset + i][col_offset + j];
+          sub_matrix_2[index] = matrix_2[row_offset + i][col_offset + j];
           index++;
         }
-        printf("\n");
       }
+
       col_offset = (col_offset + sub_size) % size;
-      if (i % sub_size == 0) {
-        /* row_offset += sub_size; */
-        row_offset = 0;
+      if (!col_offset) {
+        row_offset += sub_size;
       }
+
       // if non root, send data
-      if (i > 0) {
-        MPI_Send(sub_matrix_1, total_size, MPI_DOUBLE, i, TAG_DISTRIBUTE + 1,
-                 MPI_COMM_WORLD);
-        MPI_Send(sub_matrix_2, total_size, MPI_DOUBLE, i, TAG_DISTRIBUTE + 2,
-                 MPI_COMM_WORLD);
+      if (id_process > 0) {
+        MPI_Send(sub_matrix_1, total_size, MPI_DOUBLE, id_process,
+                 TAG_DISTRIBUTE + 1, MPI_COMM_WORLD);
+        MPI_Send(sub_matrix_2, total_size, MPI_DOUBLE, id_process,
+                 TAG_DISTRIBUTE + 2, MPI_COMM_WORLD);
       } else {
         memcpy(local_matrix_1, sub_matrix_1, total_size);
         memcpy(local_matrix_2, sub_matrix_2, total_size);
