@@ -3,8 +3,7 @@
 
 #include "mpi.h"
 
-#define TAG_DISTRIBUTE_SEND 4
-#define TAG_DISTRIBUTE_RECV 2
+#define TAG_DISTRIBUTE 4
 
 #define TAG_RECOMPOSE 42
 

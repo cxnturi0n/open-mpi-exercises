@@ -1,7 +1,8 @@
 #include "../include/broadcast_rolling_multiply.h"
+#include "../include/messages.h"
 #include "../include/utils.h"
 #include "mpi.h"
-#include <messages.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 void broadcast_rolling_multiply(double *local_matrix_1, double *local_matrix_2,
@@ -22,19 +23,26 @@ void broadcast_rolling_multiply(double *local_matrix_1, double *local_matrix_2,
     int sender_rank;
     MPI_Cart_rank(*torus, coordinate, &sender_rank);
     // send local matrix 1 (broadcast on the same rows)
-    MPI_BCast(local_matrix_1, sub_matrix_size, MPI_DOUBLE, sender_rank,
-              rows_comm);
+    MPI_Bcast(local_matrix_1, sub_matrix_size, MPI_DOUBLE, sender_rank,
+              *rows_comm);
     // send local matrix 2 (broadcast on the same cols)
-    MPI_BCast(local_matrix_2, sub_matrix_size, MPI_DOUBLE, sender_rank,
-              cols_comm);
+    MPI_Bcast(local_matrix_2, sub_matrix_size, MPI_DOUBLE, sender_rank,
+              *cols_comm);
 
     matrix_product(local_matrix_1, local_matrix_2, local_result,
                    sub_matrix_size);
 
   } else {
 
-    double receive_buffer_1[sub_matrix_size] = {0.0};
-    double receive_buffer_2[sub_matrix_size] = {0.0};
+    double *receive_buffer_1 =
+        (double *)malloc(sizeof(double) * sub_matrix_size);
+    double *receive_buffer_2 =
+        (double *)malloc(sizeof(double) * sub_matrix_size);
+
+    if (!receive_buffer_1 || !receive_buffer_2) {
+      fprintf(stderr, MALLOC_FAILURE);
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+    }
 
     // get emitter coordinate
     // the emitter is on the same row but
@@ -45,15 +53,17 @@ void broadcast_rolling_multiply(double *local_matrix_1, double *local_matrix_2,
     MPI_Cart_rank(*torus, coord_emitter, &emitter_id);
 
     MPI_Recv(receive_buffer_1, sub_matrix_size, MPI_DOUBLE, emitter_id,
-             TAG_BROADCAST_MATRIX_1, rows_comm, MPI_STATUS_IGNORE);
+             TAG_BROADCAST_MATRIX_1, *rows_comm, MPI_STATUS_IGNORE);
     MPI_Recv(receive_buffer_2, sub_matrix_size, MPI_DOUBLE, emitter_id,
-             TAG_BROADCAST_MATRIX_2, cols_comm, MPI_STATUS_IGNORE);
+             TAG_BROADCAST_MATRIX_2, *cols_comm, MPI_STATUS_IGNORE);
 
     matrix_product(local_matrix_1, receive_buffer_2, local_result,
                    sub_matrix_size);
 
     matrix_product(local_matrix_2, receive_buffer_1, local_result,
                    sub_matrix_size);
+    free(receive_buffer_1);
+    free(receive_buffer_2);
   }
   return;
 }
