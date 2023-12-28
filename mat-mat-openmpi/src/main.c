@@ -140,12 +140,8 @@ int main(int argc, char *argv[]) {
 
   double start = MPI_Wtime();
 
-  for (int i = 0; i < number_row_procs; i++) {
-    setup_emitters(emitters_row, emitters_col, number_col_procs, i);
-    broadcast_rolling_multiply(local_matrix_1, local_matrix_2, local_result,
-                               &torus, &rows, &cols, sub_size, number_row_procs,
-                               i, emitters_row, emitters_col);
-  }
+  broadcast_rolling_multiply(local_matrix_1, local_matrix_2, local_result,
+                             &torus, &rows, &cols, sub_size, number_row_procs);
 
   double end = MPI_Wtime();
 

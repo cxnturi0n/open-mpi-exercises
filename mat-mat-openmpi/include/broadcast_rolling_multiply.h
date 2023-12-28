@@ -8,10 +8,9 @@
 
 void setup_emitters(int **emitters_row, int **emitters_col, int size, int step);
 
-void broadcast_rolling_multiply(double *local_matrix_1, double *local_matrix_2,
-                                double *local_result, MPI_Comm *torus,
+void broadcast_rolling_multiply(double *sub_matrix_1, double *sub_matrix_2,
+                                double *sub_result, MPI_Comm *torus,
                                 MPI_Comm *rows_comm, MPI_Comm *cols_comm,
-                                int sub_size, int proc_per_row_col, int step,
-                                int **emitter_row, int **emitter_col);
+                                int size, int proc_in_group);
 
 #endif // BROADCAST_ROLLING_MULTIPLY_H_
