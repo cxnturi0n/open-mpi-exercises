@@ -101,8 +101,10 @@ int main(int argc, char *argv[]) {
 
   int sub_size = size / number_row_procs;
 
+  local_matrix_1 = (double *)calloc(sub_size * sub_size, sizeof(double));
+  local_matrix_2 = (double *)calloc(sub_size * sub_size, sizeof(double));
   local_result = (double *)calloc(sub_size * sub_size, sizeof(double));
-  if (!local_result) {
+  if (!local_matrix_1 || !local_matrix_2 || !local_result) {
     if (rank == 0) {
       fprintf(stderr, MALLOC_FAILURE);
     }
@@ -112,42 +114,52 @@ int main(int argc, char *argv[]) {
   distribute(nprocs, rank, matrix_1, matrix_2, local_matrix_1, local_matrix_2,
              size, sub_size);
 
-  /* printf("proc per row := %d\t per col := %d, sub size := %d\n", */
-  /*        number_row_procs, number_col_procs, sub_size); */
-  /* for (int i = 0; i < sub_size; i++) { */
-  /*   for (int j = 0; j < sub_size; j++) { */
-  /*     printf("Rank id [%d]: element %lf at <%d, %d> (real pos: %d) \n", rank,
-   */
-  /*            local_matrix_1[i * sub_size + j], i, j, i * sub_size + j); */
-  /*   } */
-  /* } */
-
   if (rank == 0) {
     free(matrix_1);
     free(matrix_2);
   }
 
-  // get coordinate of communicationc couples
-  // sender & receiver
-
   MPI_Barrier(MPI_COMM_WORLD);
+
+  int **emitters_row = (int **)malloc(number_col_procs * sizeof(int *));
+  int **emitters_col = (int **)malloc(number_col_procs * sizeof(int *));
+
+  if (!emitters_row || !emitters_col) {
+    fprintf(stderr, MALLOC_FAILURE);
+    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+  }
+
+  for (int i = 0; i < number_row_procs; i++) {
+    emitters_row[i] = (int *)calloc(number_col_procs, sizeof(int));
+    emitters_col[i] = (int *)calloc(number_col_procs, sizeof(int));
+    if (!emitters_row[i] || !emitters_col[i]) {
+      fprintf(stderr, MALLOC_FAILURE);
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+    }
+  }
 
   double start = MPI_Wtime();
 
   for (int i = 0; i < number_row_procs; i++) {
+    setup_emitters(emitters_row, emitters_col, number_col_procs, i);
     broadcast_rolling_multiply(local_matrix_1, local_matrix_2, local_result,
                                &torus, &rows, &cols, sub_size, number_row_procs,
-                               i);
-    printf("step %d\n", i);
+                               i, emitters_row, emitters_col);
   }
 
   double end = MPI_Wtime();
 
-  printf("\nBMR DONE\n\n");
+  for (int i = 0; i < number_col_procs; i++) {
+    free(emitters_row[i]);
+    free(emitters_col[i]);
+  }
+
+  free(emitters_row);
+  free(emitters_col);
 
   double delta_time = end - start;
 
-  double max_time;
+  double max_time = 0;
   MPI_Reduce(&max_time, &delta_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
   if (rank == 0) {
@@ -158,7 +170,16 @@ int main(int argc, char *argv[]) {
   double **result =
       recompose_result(local_result, sub_size, size, rank, nprocs);
 
-  // TODO: add control to see if the algorithm works
+  if (rank == 0) {
+    printf("RESULT:\n");
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        printf("%lf, ", result[i][j]);
+      }
+      printf("\n");
+    }
+    printf("\n\n");
+  }
 
   free(local_matrix_1);
   free(local_matrix_2);

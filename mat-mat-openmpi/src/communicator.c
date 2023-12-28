@@ -49,13 +49,6 @@ void distribute(int nprocs, int rank, double **matrix_1, double **matrix_2,
                 double *local_matrix_1, double *local_matrix_2, int size,
                 int sub_size) {
   int total_size = sub_size * sub_size;
-  local_matrix_1 = (double *)malloc(total_size * sizeof(double));
-  local_matrix_2 = (double *)malloc(total_size * sizeof(double));
-
-  if (!local_matrix_1 || !local_matrix_2) {
-    fprintf(stderr, MALLOC_FAILURE);
-    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-  }
 
   if (rank == 0) {
     double *sub_matrix_1 = (double *)malloc(total_size * sizeof(double));
@@ -91,11 +84,13 @@ void distribute(int nprocs, int rank, double **matrix_1, double **matrix_2,
         MPI_Send(sub_matrix_2, total_size, MPI_DOUBLE, id_process,
                  TAG_DISTRIBUTE + 2, MPI_COMM_WORLD);
       } else {
-        memcpy(local_matrix_1, sub_matrix_1, total_size);
-        memcpy(local_matrix_2, sub_matrix_2, total_size);
+        // copy on local matrix for process 1
+        for (int i = 0; i < total_size; i++) {
+          local_matrix_1[i] = sub_matrix_1[i];
+          local_matrix_2[i] = sub_matrix_2[i];
+        }
       }
     }
-
     free(sub_matrix_1);
     free(sub_matrix_2);
 
@@ -116,7 +111,7 @@ double **recompose_result(double *local_result, int sub_size, int size,
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
   for (int i = 0; i < size; i++) {
-    result[i] = (double *)malloc(sizeof(double));
+    result[i] = (double *)malloc(size * sizeof(double));
     if (!result[i]) {
       fprintf(stderr, MALLOC_FAILURE);
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
@@ -131,8 +126,12 @@ double **recompose_result(double *local_result, int sub_size, int size,
       }
     }
 
-    double *buffer;
     int total_sub_size = sub_size * sub_size;
+    double *buffer = (double *)malloc(total_sub_size * sizeof(double));
+    if (!buffer) {
+      fprintf(stderr, MALLOC_FAILURE);
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+    }
     int row_offset = 0;
     int col_offset = 0;
     for (int i = 1; i < nprocs; i++) {
@@ -148,7 +147,7 @@ double **recompose_result(double *local_result, int sub_size, int size,
         row_offset += sub_size;
       }
     }
-
+    free(buffer);
   } else {
     MPI_Send(local_result, sub_size * sub_size, MPI_DOUBLE, 0,
              TAG_RECOMPOSE + rank, MPI_COMM_WORLD);
