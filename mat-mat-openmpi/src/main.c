@@ -10,8 +10,7 @@
 #include "../include/messages.h"
 #include "../include/utils.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   srand(time(NULL));
 
   int rank, nprocs;
@@ -29,37 +28,29 @@ int main(int argc, char *argv[])
   int coordinates[] = {0, 0};
   int size = atoi(argv[1]);
 
-  if (!is_number(argv[1]))
-  {
-    if (rank == 0)
-    {
+  if (!is_number(argv[1])) {
+    if (rank == 0) {
       fprintf(stderr, NOT_A_VALID_NUMBER_INPUT);
     }
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 
-  if (size < nprocs)
-  {
-    if (rank == 0)
-    {
+  if (size < nprocs) {
+    if (rank == 0) {
       fprintf(stderr, SIZE_LESS_THAN_PROCS);
     }
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 
-  if (nprocs % number_row_procs != 0)
-  {
-    if (rank == 0)
-    {
+  if (nprocs % number_row_procs != 0) {
+    if (rank == 0) {
       fprintf(stderr, PROC_NOT_MUL_OF_ROW_PROCS);
     }
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 
-  if (number_row_procs != number_col_procs)
-  {
-    if (rank == 0)
-    {
+  if (number_row_procs != number_col_procs) {
+    if (rank == 0) {
       fprintf(stderr, PROC_ROW_NEQ_PROC_COL);
     }
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
@@ -75,29 +66,23 @@ int main(int argc, char *argv[])
   double *local_matrix_2;
   double *local_result;
   // root process
-  if (rank == 0)
-  {
+  if (rank == 0) {
     matrix_1 = (double **)malloc(size * sizeof(double *));
     matrix_2 = (double **)malloc(size * sizeof(double *));
 
-    if (!matrix_1 || !matrix_2)
-    {
-      if (rank == 0)
-      {
+    if (!matrix_1 || !matrix_2) {
+      if (rank == 0) {
         fprintf(stderr, MALLOC_FAILURE);
       }
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
 
-    for (int i = 0; i < size; i++)
-    {
+    for (int i = 0; i < size; i++) {
       matrix_1[i] = (double *)malloc(size * sizeof(double));
       matrix_2[i] = (double *)malloc(size * sizeof(double));
 
-      if (!matrix_1[i] || !matrix_2[i])
-      {
-        if (rank == 0)
-        {
+      if (!matrix_1[i] || !matrix_2[i]) {
+        if (rank == 0) {
           fprintf(stderr, MALLOC_FAILURE);
         }
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
@@ -105,10 +90,8 @@ int main(int argc, char *argv[])
     }
 
     // fill matrices
-    for (int i = 0; i < size; i++)
-    {
-      for (int j = 0; j < size; j++)
-      {
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
         matrix_1[i][j] = random_number();
         matrix_2[i][j] = random_number();
       }
@@ -120,10 +103,8 @@ int main(int argc, char *argv[])
   local_matrix_1 = (double *)calloc(sub_size * sub_size, sizeof(double));
   local_matrix_2 = (double *)calloc(sub_size * sub_size, sizeof(double));
   local_result = (double *)calloc(sub_size * sub_size, sizeof(double));
-  if (!local_matrix_1 || !local_matrix_2 || !local_result)
-  {
-    if (rank == 0)
-    {
+  if (!local_matrix_1 || !local_matrix_2 || !local_result) {
+    if (rank == 0) {
       fprintf(stderr, MALLOC_FAILURE);
     }
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
@@ -132,33 +113,12 @@ int main(int argc, char *argv[])
   distribute(nprocs, rank, matrix_1, matrix_2, local_matrix_1, local_matrix_2,
              size, sub_size);
 
-  if (rank == 0)
-  {
+  if (rank == 0) {
     free(matrix_1);
     free(matrix_2);
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-
-  int **emitters_row = (int **)malloc(number_col_procs * sizeof(int *));
-  int **emitters_col = (int **)malloc(number_col_procs * sizeof(int *));
-
-  if (!emitters_row || !emitters_col)
-  {
-    fprintf(stderr, MALLOC_FAILURE);
-    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-  }
-
-  for (int i = 0; i < number_row_procs; i++)
-  {
-    emitters_row[i] = (int *)calloc(number_col_procs, sizeof(int));
-    emitters_col[i] = (int *)calloc(number_col_procs, sizeof(int));
-    if (!emitters_row[i] || !emitters_col[i])
-    {
-      fprintf(stderr, MALLOC_FAILURE);
-      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-    }
-  }
 
   double start = MPI_Wtime();
 
@@ -176,8 +136,7 @@ int main(int argc, char *argv[])
   MPI_Reduce(&delta_time, &avg_time, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   avg_time /= nprocs;
 
-  if (rank == 0)
-  {
+  if (rank == 0) {
     // number of procs, matrix size, time elapsed
     printf("%d, %d, %.10lf, %.10lf\n", nprocs, size, max_time, avg_time);
   }
@@ -185,15 +144,11 @@ int main(int argc, char *argv[])
   double **result = recompose_result(local_result, sub_size, size, rank, nprocs,
                                      number_row_procs, &torus);
 
-int x=0,u=0;
   // // print result
-  if (rank == 0)
-  {
+  if (rank == 0) {
     printf("RESULT:\n");
-    for (int i = 0; i < size; i++)
-    {
-      for (int j = 0; j < size; j++)
-      {
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
         printf("%lf\n", result[i][j]);
       }
     }
@@ -202,10 +157,8 @@ int x=0,u=0;
   free(local_matrix_1);
   free(local_matrix_2);
   free(local_result);
-  if (rank == 0)
-  {
-    for (int i = 0; i < size; i++)
-    {
+  if (rank == 0) {
+    for (int i = 0; i < size; i++) {
       free(result[i]);
     }
     free(result);

@@ -5,8 +5,6 @@
 
 #define TAG_SHARE_MATRIX_2 42
 
-void setup_emitters(int **emitters_row, int **emitters_col, int size, int step);
-
 void broadcast_rolling_multiply(double *sub_matrix_1, double *sub_matrix_2,
                                 double *sub_result, MPI_Comm *torus,
                                 MPI_Comm *rows_comm, MPI_Comm *cols_comm,
