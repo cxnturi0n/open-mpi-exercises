@@ -145,14 +145,6 @@ int main(int argc, char *argv[]) {
 
   double end = MPI_Wtime();
 
-  for (int i = 0; i < number_col_procs; i++) {
-    free(emitters_row[i]);
-    free(emitters_col[i]);
-  }
-
-  free(emitters_row);
-  free(emitters_col);
-
   double delta_time = end - start;
 
   double max_time = 0;
@@ -163,24 +155,30 @@ int main(int argc, char *argv[]) {
     printf("%d, %d, %lf\n", nprocs, size, max_time);
   }
 
-  double **result =
-      recompose_result(local_result, sub_size, size, rank, nprocs);
+  double **result = recompose_result(local_result, sub_size, size, rank, nprocs,
+                                     number_row_procs, &torus);
 
-  if (rank == 0) {
-    printf("RESULT:\n");
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
-        printf("%lf, ", result[i][j]);
-      }
-      printf("\n");
-    }
-    printf("\n\n");
-  }
+  // print result
+  /* if (rank == 0) { */
+  /*   printf("RESULT:\n"); */
+  /*   for (int i = 0; i < size; i++) { */
+  /*     for (int j = 0; j < size; j++) { */
+  /*       printf("%lf, ", result[i][j]); */
+  /*     } */
+  /*     printf("\n"); */
+  /*   } */
+  /*   printf("\n\n"); */
+  /* } */
 
   free(local_matrix_1);
   free(local_matrix_2);
   free(local_result);
-  free(result);
+  if (rank == 0) {
+    for (int i = 0; i < size; i++) {
+      free(result[i]);
+    }
+    free(result);
+  }
   MPI_Finalize();
   return 0;
 }

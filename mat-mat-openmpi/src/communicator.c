@@ -8,7 +8,6 @@
 void build_2D_torus(MPI_Comm *torus_comm, MPI_Comm *rows_comm,
                     MPI_Comm *cols_comm, int num_procs_rows,
                     int num_procs_cols) {
-  // don't reorder processors
   int reorder = 1;
 
   int *dimensions = (int *)malloc(2 * sizeof(int));
@@ -104,54 +103,49 @@ void distribute(int nprocs, int rank, double **matrix_1, double **matrix_2,
 }
 
 double **recompose_result(double *local_result, int sub_size, int size,
-                          int rank, int nprocs) {
-  double **result = (double **)malloc(sizeof(double *) * size);
-  if (!result) {
-    fprintf(stderr, MALLOC_FAILURE);
-    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-  }
-  for (int i = 0; i < size; i++) {
-    result[i] = (double *)malloc(size * sizeof(double));
-    if (!result[i]) {
-      fprintf(stderr, MALLOC_FAILURE);
-      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-    }
-  }
+                          int rank, int nprocs, int proc_group_size,
+                          MPI_Comm *torus) {
 
+  double **result;
+  int total_size = sub_size * sub_size;
   if (rank == 0) {
-    // copy local result
-    for (int i = 0; i < sub_size; i++) {
-      for (int j = 0; j < sub_size; j++) {
-        result[i][j] = local_result[i * sub_size + j];
-      }
-    }
-
-    int total_sub_size = sub_size * sub_size;
-    double *buffer = (double *)malloc(total_sub_size * sizeof(double));
-    if (!buffer) {
+    result = (double **)malloc(sizeof(double *) * size);
+    if (!result) {
       fprintf(stderr, MALLOC_FAILURE);
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
-    int row_offset = 0;
-    int col_offset = 0;
-    for (int i = 1; i < nprocs; i++) {
-      MPI_Recv(buffer, total_sub_size, MPI_DOUBLE, i, TAG_RECOMPOSE + i,
-               MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      for (int j = 0; j < total_sub_size; j++) {
-        int row = j / sub_size;
-        int col = j % sub_size;
-        result[row_offset + row][col_offset + col] = buffer[j];
+    for (int i = 0; i < size; i++) {
+      result[i] = (double *)malloc(size * sizeof(double));
+      if (!result[i]) {
+        fprintf(stderr, MALLOC_FAILURE);
+        MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
       }
+    }
+
+    for (int index = 0; index < total_size; index++) {
+      int row = index / sub_size;
+      int col = index % sub_size;
+      result[row][col] = local_result[index];
+    }
+
+    int row_offset = 0, col_offset = sub_size;
+    for (int id = 1; id < nprocs; id++) {
+      MPI_Recv(local_result, total_size, MPI_DOUBLE, id, TAG_RECOMPOSE + id,
+               *torus, MPI_STATUS_IGNORE);
+      for (int index = 0; index < total_size; index++) {
+        int row = index / sub_size;
+        int col = index % sub_size;
+        result[row_offset + row][col_offset + col] = local_result[index];
+      }
+
       col_offset = (col_offset + sub_size) % size;
-      if (i % sub_size == 0) {
+      if (!col_offset) {
         row_offset += sub_size;
       }
     }
-    free(buffer);
   } else {
-    MPI_Send(local_result, sub_size * sub_size, MPI_DOUBLE, 0,
-             TAG_RECOMPOSE + rank, MPI_COMM_WORLD);
+    MPI_Send(local_result, total_size, MPI_DOUBLE, 0, TAG_RECOMPOSE + rank,
+             *torus);
   }
-
   return result;
 }

@@ -1,10 +1,9 @@
 #ifndef BROADCAST_ROLLING_MULTIPLY_H_
 #define BROADCAST_ROLLING_MULTIPLY_H_
 
-#define TAG_BROADCAST_MATRIX_1 100
-#define TAG_BROADCAST_MATRIX_2 200
-
 #include "mpi.h"
+
+#define TAG_SHARE_MATRIX_2 42
 
 void setup_emitters(int **emitters_row, int **emitters_col, int size, int step);
 

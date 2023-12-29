@@ -3,7 +3,7 @@
 
 #include "mpi.h"
 
-#define TAG_DISTRIBUTE 4
+#define TAG_DISTRIBUTE 16
 
 #define TAG_RECOMPOSE 42
 
@@ -16,6 +16,7 @@ void distribute(int nprocs, int rank, double **matrix_1, double **matrix_2,
                 int sub_size);
 
 double **recompose_result(double *local_result, int sub_size, int size,
-                          int rank, int nprocs);
+                          int rank, int nprocs, int proc_group_size,
+                          MPI_Comm *torus);
 
 #endif // COMMUNICATOR_H_

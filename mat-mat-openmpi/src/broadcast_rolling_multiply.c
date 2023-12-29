@@ -60,59 +60,50 @@ void broadcast_rolling_multiply(double *sub_matrix_1, double *sub_matrix_2,
 
   // if it is on coordinate I copy the data on the buffer to send;
   if (coordinate[0] == coordinate[1]) {
-    memcpy(buffer, sub_matrix_1, total_size * sizeof(double));
+    for (int i = 0; i < total_size; i++) {
+      buffer[i] = sub_matrix_1[i];
+    }
   }
 
   MPI_Bcast(buffer, total_size, MPI_DOUBLE, row_root, *rows_comm);
 
   matrix_product(buffer, sub_matrix_2, sub_result, size);
 
+  // remaining steps
   for (int i = 1; i < proc_in_group; i++) {
     // if I'm on the i-th step diagonal
     setup_emitters(emitters_row, emitters_col, proc_in_group, 0);
     row_root = emitters_row[coordinate[0]][coordinate[1]];
     col_root = emitters_col[coordinate[0]][coordinate[1]];
     if ((coordinate[0] + i) % proc_in_group == coordinate[1]) {
-      memcpy(buffer, sub_matrix_1, total_size * sizeof(double));
-    } else {
+      for (int i = 0; i < total_size; i++) {
+        buffer[i] = sub_matrix_1[i];
+      }
     }
 
     MPI_Bcast(buffer, total_size, MPI_DOUBLE, row_root, *rows_comm);
+
+    int receive_from = (coordinate[0] - i) % proc_in_group;
+    int send_to = (coordinate[0] + i) % proc_in_group;
+
+    // request will be ignored for simplicity
+    MPI_Request req;
+    MPI_Isend(sub_matrix_2, total_size, MPI_DOUBLE, send_to, TAG_SHARE_MATRIX_2,
+              *cols_comm, &req);
+
+    MPI_Recv(sub_matrix_2, total_size, MPI_DOUBLE, receive_from,
+             TAG_SHARE_MATRIX_2, *cols_comm, MPI_STATUS_IGNORE);
+
+    matrix_product(buffer, sub_matrix_2, sub_result, size);
   }
 
-  /* // used to receive portion of matrix 2 from processor next processor */
-  /* double *receive_buffer_2 = (double *)malloc(sizeof(double) *
-   * sub_matrix_size); */
+  for (int i = 0; i < proc_in_group; i++) {
+    free(emitters_row[i]);
+    free(emitters_col[i]);
+  }
 
-  /* if ((coordinate[0] + step) % proc_per_row_col == coordinate[1]) { */
-
-  /*   MPI_Bcast(local_matrix_1, sub_matrix_size, MPI_DOUBLE, row_root, */
-  /*             *rows_comm); */
-
-  /*   if (step == 0) { */
-  /*     matrix_product(local_matrix_1, local_matrix_2, local_result,
-   * sub_size);
-   */
-  /*   } */
-
-  /* } else { */
-  /*   double *receive_buffer_1 = */
-  /*       (double *)malloc(sizeof(double) * sub_matrix_size); */
-
-  /*   // receive matrix 1 from broadcast */
-  /*   if (!receive_buffer_1) { */
-  /*     fprintf(stderr, MALLOC_FAILURE); */
-  /*     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE); */
-  /*   } */
-
-  /*   MPI_Bcast(receive_buffer_1, sub_matrix_size, MPI_DOUBLE, row_root, */
-  /*             *rows_comm); */
-
-  /*   matrix_product(local_matrix_2, receive_buffer_1, local_result,
-   * sub_size);
-   */
-
-  /*   free(receive_buffer_1); */
-  /* } */
+  free(emitters_row);
+  free(emitters_col);
+  free(buffer);
   return;
 }
