@@ -1,0 +1,38 @@
+#PBS -q studenti
+#PBS -l nodes=8:ppn=8
+#PBS -N MatxMat_4_procs.pbs
+#PBS -o MatxMat_4_procs.out
+#PBS -e MatxMat_4_procs.err
+#PBS -V
+
+sort -u $PBS_NODEFILE > hostlist
+
+PBS_O_WORKDIR=$PBS_O_HOME/mat-mat-product
+
+echo -----------------------
+
+echo This job is allocated on $NCPU cpus on hosts:
+cat hostlist
+
+echo ---------------------
+
+echo PBS: qsub is running on $PBS_O_HOST
+echo PBS: originating queue is $PBS_O_QUEUE
+echo PBS: executing queue is $PBS_QUEUE
+echo PBS: working directory is $PBS_O_WORKDIR
+echo PBS: execution mode is $PBS_ENVIRONMENT
+echo PBS: job identifier is $PBS_JOBID
+echo PBS: job name is $PBS_JOBNAME
+echo PBS: node file is $PBS_NODEFILE
+echo PBS: current home directory is $PBS_O_HOME
+echo PBS: PATH = $PBS_O_PATH
+
+echo -----------------------------------
+
+/usr/lib64/openmpi/1.4-gcc/bin/mpicc -std=c99 -o $PBS_O_WORKDIR/matxmat $PBS_O_WORKDIR/src/main.c $PBS_O_WORKDIR/src/communicator.c $PBS_O_WORKDIR/src/broadcast_rolling_multiply.c $PBS_O_WORKDIR/src/utils.c 
+
+/usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist -np 4 $PBS_O_WORKDIR/matxmat 720
+/usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist -np 4 $PBS_O_WORKDIR/matxmat 1008
+/usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist -np 4 $PBS_O_WORKDIR/matxmat 1440
+/usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist -np 4 $PBS_O_WORKDIR/matxmat 1728
+/usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist -np 4 $PBS_O_WORKDIR/matxmat 2160

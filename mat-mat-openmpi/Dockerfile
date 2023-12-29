@@ -1,3 +1,5 @@
+# mpicc src/main.c src/communicator.c src/utils.c src/broadcast_rolling_multiply.c -o matxmat
+# hostname>hostfile && mpirun -hostfile hostfile -np 8 matxmat
 FROM alpine:3.16.0
 
 RUN apk update \
@@ -36,22 +38,22 @@ RUN adduser -D ${USER}
 ENV USER_HOME /home/${USER}
 RUN chown -R ${USER}:${USER} ${USER_HOME}
 
-# #### CREATE WORKING DIRECTORY FOR USER ####
-# ARG WORKDIR=/project
-# ENV WORKDIR ${WORKDIR}
-# ENV ENV=${WORKDIR}/.rc
-# RUN mkdir ${WORKDIR}
+#### CREATE WORKING DIRECTORY FOR USER ####
+ARG WORKDIR=/project
+ENV WORKDIR ${WORKDIR}
+ENV ENV=${WORKDIR}/.rc
+RUN mkdir ${WORKDIR}
 
-# WORKDIR ${WORKDIR}
+WORKDIR ${WORKDIR}
 
-# ADD src src
-# ADD include include
-# ADD test test
+ADD src src
+ADD include include
+ADD test test
 
-# RUN git clone https://github.com/bats-core/bats-core.git 
+RUN git clone https://github.com/bats-core/bats-core.git 
 
-# RUN chown -R ${USER}:${USER} ${WORKDIR}
+RUN chown -R ${USER}:${USER} ${WORKDIR}
 
-# RUN echo 'export PS1="\[$(tput bold)\]\[\033[38;5;196m\]\u\[$(tput sgr0)\]\[\033[38;5;20m\]@\[$(tput sgr0)\]\[\033[38;5;27m\]\h\[$(tput sgr0)\]\[\033[38;5;33m\][\[$(tput sgr0)\]\[\033[38;5;45m\]\w\[$(tput sgr0)\]\[\033[38;5;33m\]]\[$(tput sgr0)\]\[$(tput bold)\]\[\033[38;5;46m\]>"' >> ${WORKDIR}/.rc
+RUN echo 'export PS1="\[$(tput bold)\]\[\033[38;5;196m\]\u\[$(tput sgr0)\]\[\033[38;5;20m\]@\[$(tput sgr0)\]\[\033[38;5;27m\]\h\[$(tput sgr0)\]\[\033[38;5;33m\][\[$(tput sgr0)\]\[\033[38;5;45m\]\w\[$(tput sgr0)\]\[\033[38;5;33m\]]\[$(tput sgr0)\]\[$(tput bold)\]\[\033[38;5;46m\]>"' >> ${WORKDIR}/.rc
 
-# USER ${USER}
+USER ${USER}

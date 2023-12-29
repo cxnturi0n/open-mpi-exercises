@@ -170,28 +170,34 @@ int main(int argc, char *argv[])
   double delta_time = end - start;
 
   double max_time = 0;
-  MPI_Reduce(&max_time, &delta_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  double avg_time = 0;
+
+  MPI_Reduce(&delta_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&delta_time, &avg_time, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  avg_time /= nprocs;
 
   if (rank == 0)
   {
     // number of procs, matrix size, time elapsed
-    printf("%d, %d, %lf\n", nprocs, size, max_time);
+    printf("%d, %d, %.10lf, %.10lf\n", nprocs, size, max_time, avg_time);
   }
 
   double **result = recompose_result(local_result, sub_size, size, rank, nprocs,
                                      number_row_procs, &torus);
 
-  // print result
-  /* if (rank == 0) { */
-  /*   printf("RESULT:\n"); */
-  /*   for (int i = 0; i < size; i++) { */
-  /*     for (int j = 0; j < size; j++) { */
-  /*       printf("%lf, ", result[i][j]); */
-  /*     } */
-  /*     printf("\n"); */
-  /*   } */
-  /*   printf("\n\n"); */
-  /* } */
+int x=0,u=0;
+  // // print result
+  if (rank == 0)
+  {
+    printf("RESULT:\n");
+    for (int i = 0; i < size; i++)
+    {
+      for (int j = 0; j < size; j++)
+      {
+        printf("%lf\n", result[i][j]);
+      }
+    }
+  }
 
   free(local_matrix_1);
   free(local_matrix_2);
