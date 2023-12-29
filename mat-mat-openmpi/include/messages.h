@@ -11,6 +11,6 @@
 
 #define NOT_A_VALID_NUMBER_INPUT "[ERR: PARSE INPUT] given input is not a valid number"
 
-#define SIZE_LESS_THAN_PROCS "[ERR: REQUIREMENT] given size should be greather or equal than processors"
+#define SIZE_LESS_THAN_PROCS "[ERR: REQUIREMENT] given size should be greater or equal than processors"
 
 #endif // MESSAGES_H_

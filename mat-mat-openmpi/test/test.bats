@@ -51,7 +51,7 @@ setup(){
 
   [ "$status" -eq 1 ]
 
-  grep -q 'given size should be greather or equal than processors' "$WORKDIR/MatxMat.err"
+  grep -q 'given size should be greater or equal than processors' "$WORKDIR/MatxMat.err"
   [ "$?" -eq 0 ]
   
 }
@@ -65,7 +65,7 @@ setup(){
 
 }
 
-@test "size_greather_than_processors_should_succeed" {
+@test "size_greater_than_processors_should_succeed" {
   run bash -c "mpirun --hostfile $WORKDIR/hostfile -n 4 $WORKDIR/matxmat 16 > $WORKDIR/MatxMat.out 2> $WORKDIR/MatxMat.err"
 
   [ "$status" -eq 0 ]
