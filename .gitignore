@@ -2,5 +2,4 @@
 .DS_Store
 **/sum-n-numbers/choice_strategy/test/bats-core/
 **/*.err
-**/*.out
 **/sum_n_numbers
