@@ -28,21 +28,10 @@ void broadcast_rolling_multiply(double *sub_matrix_1, double *sub_matrix_2,
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 
-  // if it is on coordinate I copy the data on the buffer to send;
-  if (coordinate[0] == coordinate[1]) {
-    for (int i = 0; i < total_size; i++) {
-      buffer[i] = sub_matrix_1[i];
-    }
-  }
-
-  MPI_Bcast(buffer, total_size, MPI_DOUBLE, row_root, *rows_comm);
-
-  matrix_product(buffer, sub_matrix_2, sub_result, size);
-
-  for (int i = 1; i < proc_in_group; i++) {
+  for (int step = 0; step < proc_in_group; step++) {
     // if I'm on the i-th step diagonal
-    int row_root = (coordinate[0] + i) % proc_in_group;
-    if ((coordinate[0] + i) % proc_in_group == coordinate[1]) {
+    int row_root = (coordinate[0] + step) % proc_in_group;
+    if ((coordinate[0] + step) % proc_in_group == coordinate[1]) {
       for (int i = 0; i < total_size; i++) {
         buffer[i] = sub_matrix_1[i];
       }
@@ -50,16 +39,18 @@ void broadcast_rolling_multiply(double *sub_matrix_1, double *sub_matrix_2,
 
     MPI_Bcast(buffer, total_size, MPI_DOUBLE, row_root, *rows_comm);
 
-    int receive_from = (coordinate[0] - i) % proc_in_group;
-    int send_to = (coordinate[0] + i) % proc_in_group;
+    if (step > 0) {
+      int receive_from = (coordinate[0] - 1) % proc_in_group;
+      int send_to = (coordinate[0] + 1) % proc_in_group;
 
-    // request will be ignored for simplicity
-    MPI_Request req;
-    MPI_Isend(sub_matrix_2, total_size, MPI_DOUBLE, send_to, TAG_SHARE_MATRIX_2,
-              *cols_comm, &req);
+      // request will be ignored for simplicity
+      MPI_Request req;
+      MPI_Isend(sub_matrix_2, total_size, MPI_DOUBLE, send_to,
+                TAG_SHARE_MATRIX_2, *cols_comm, &req);
 
-    MPI_Recv(sub_matrix_2, total_size, MPI_DOUBLE, receive_from,
-             TAG_SHARE_MATRIX_2, *cols_comm, MPI_STATUS_IGNORE);
+      MPI_Recv(sub_matrix_2, total_size, MPI_DOUBLE, receive_from,
+               TAG_SHARE_MATRIX_2, *cols_comm, MPI_STATUS_IGNORE);
+    }
 
     matrix_product(buffer, sub_matrix_2, sub_result, size);
   }
